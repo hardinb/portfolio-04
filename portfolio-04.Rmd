@@ -1,0 +1,87 @@
+---
+title: "Portfolio 4"
+author: "Ben Hardin"
+date: "2023-03-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R
+
+```{r data}
+library(tidyverse)
+
+honesty <- read.csv("data/Honesty Goals data (Deidentified).csv")
+
+#Turning -99 into missing data
+honesty <- honesty %>% 
+  mutate_all(~replace(., . == -99, NA))
+
+#Creating a new filtered data set
+honesty_partners_clean <- honesty %>%
+  filter(inclusionsuggestion < 2, validID == 0, partner_interaction == 1)
+```
+
+```{r centering}
+#within-person means
+honesty_partners_clean <- honesty_partners_clean %>%
+  group_by(ID) %>%
+  mutate(A_goal2_mean = mean(A_goal2, na.rm = T))
+
+#centered goals
+honesty_partners_clean <- honesty_partners_clean %>%
+  group_by(ID) %>%
+  mutate(A_goal2_centered = A_goal2 - A_goal2_mean)
+
+honesty_partners_clean <- honesty_partners_clean %>%
+  group_by(ID) %>%
+  mutate(A_goal7_mean = mean(A_goal7, na.rm = T))
+
+#centered goals
+honesty_partners_clean <- honesty_partners_clean %>%
+  group_by(ID) %>%
+  mutate(A_goal7_centered = A_goal7 - A_goal7_mean)
+```
+
+```{r plot}
+ggplot(honesty_partners_clean, aes(x = A_goal2_centered, y = A_statehonesty))+
+  geom_point(position = "jitter")+
+  geom_smooth(color = "blue")
+```
+
+```{r plot-2}
+ggplot(honesty_partners_clean, aes(x = A_goal2_centered, y = A_statehonesty))+
+  stat_smooth(method = "lm", se = F, geom = "line", linewidth = 0.6, alpha = 0.4, color = "#6699FF", aes(group = ID))+
+  geom_smooth(method = "lm", color = "black")+
+  theme_classic()+
+  geom_vline(xintercept = 0, linetype = "dashed", linewidth = 0.6)+
+  scale_y_continuous(
+    limits = c(1, 4.3),
+    expand = c(0, 0)
+    )+
+  scale_x_continuous(
+    limits = c(-3, 3),
+    expand = c(0, 0)
+    )+
+  labs(title = "Within-person contingencies between honesty and avoiding disapproval",
+       x = "How much were you trying to avoid your partner's disapproval?",
+       y = "State Honesty")
+```
+
+```{r respect}
+ggplot(honesty_partners_clean, aes(x = A_goal7_centered, y = A_statehonesty))+
+  geom_smooth(method = "lm", se = F, aes(group = ID), color = "skyblue")+
+  geom_smooth(method = "lm", color = "black")+
+  theme_classic()+
+  scale_y_continuous(
+    limits = c(1, 4.3),
+    expand = c(0, 0)
+    )+
+  scale_x_continuous(
+    limits = c(-3, 3),
+    expand = c(0, 0)
+    )
+```
