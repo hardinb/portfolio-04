@@ -46,6 +46,14 @@ honesty_partners_clean <- honesty_partners_clean %>%
   mutate(A_goal7_centered = A_goal7 - A_goal7_mean)
 ```
 
+```{r mlm}
+library(lme4)
+
+result <- lmer(A_statehonesty ~ A_goal2_centered + (1 | ID), data = honesty_partners_clean)
+
+summary(result)
+```
+
 ```{r plot}
 ggplot(honesty_partners_clean, aes(x = A_goal2_centered, y = A_statehonesty))+
   geom_point(position = "jitter")+
@@ -76,6 +84,127 @@ ggplot(honesty_partners_clean, aes(x = A_goal7_centered, y = A_statehonesty))+
   geom_smooth(method = "lm", se = F, aes(group = ID), color = "skyblue")+
   geom_smooth(method = "lm", color = "black")+
   theme_classic()+
+  scale_y_continuous(
+    limits = c(1, 4.3),
+    expand = c(0, 0)
+    )+
+  scale_x_continuous(
+    limits = c(-3, 3),
+    expand = c(0, 0)
+    )
+```
+
+```{r respect-2}
+ggplot(honesty_partners_clean, aes(x = A_goal7_centered, y = A_statehonesty))+
+  stat_smooth(method = "lm", se = F, geom = "line", linewidth = 0.6, alpha = 0.4, color = "#6699FF", aes(group = ID))+
+  geom_smooth(method = "lm", color = "black")+
+  theme_classic()+
+  geom_vline(xintercept = 0, linetype = "dashed", linewidth = 0.6)+
+  scale_y_continuous(
+    limits = c(1, 4.3),
+    expand = c(0, 0)
+    )+
+  scale_x_continuous(
+    limits = c(-3, 3),
+    expand = c(0, 0)
+    )+
+  labs(title = "Within-person contingencies between honesty and respect",
+       x = "How much were you trying to treat your partner with respect?",
+       y = "State Honesty")
+```
+
+```{r more-centered}
+honesty_partners_clean <- honesty_partners_clean %>%
+  group_by(ID) %>%
+  mutate(A_goal6_mean = mean(A_goal6, na.rm = T))
+
+#centered goals
+honesty_partners_clean <- honesty_partners_clean %>%
+  group_by(ID) %>%
+  mutate(A_goal6_centered = A_goal6 - A_goal6_mean)
+
+honesty_partners_clean <- honesty_partners_clean %>%
+  group_by(ID) %>%
+  mutate(A_goal8_mean = mean(A_goal8, na.rm = T))
+
+#centered goals
+honesty_partners_clean <- honesty_partners_clean %>%
+  group_by(ID) %>%
+  mutate(A_goal8_centered = A_goal8 - A_goal8_mean)
+```
+
+```{r feelings}
+ggplot(honesty_partners_clean, aes(x = A_goal6_centered, y = A_statehonesty))+
+  stat_smooth(method = "lm", se = F, geom = "line", linewidth = 0.6, alpha = 0.4, color = "#6699FF", aes(group = ID))+
+  geom_smooth(method = "lm", color = "black")+
+  theme_classic()+
+  geom_vline(xintercept = 0, linetype = "dashed", linewidth = 0.6)+
+  scale_y_continuous(
+    limits = c(1, 4.3),
+    expand = c(0, 0)
+    )+
+  scale_x_continuous(
+    limits = c(-3, 3),
+    expand = c(0, 0)
+    )
+```
+
+```{r caught}
+ggplot(honesty_partners_clean, aes(x = A_goal8_centered, y = A_statehonesty))+
+  stat_smooth(method = "lm", se = F, geom = "line", linewidth = 0.6, alpha = 0.4, color = "#6699FF", aes(group = ID))+
+  geom_smooth(method = "lm", color = "black")+
+  theme_classic()+
+  geom_vline(xintercept = 0, linetype = "dashed", linewidth = 0.6)+
+  scale_y_continuous(
+    limits = c(1, 4.3),
+    expand = c(0, 0)
+    )+
+  scale_x_continuous(
+    limits = c(-3, 3),
+    expand = c(0, 0)
+    )
+```
+
+```{r make-combined-benefit}
+honesty_partners_clean <- honesty_partners_clean %>%
+  mutate(combined_benefit = round((A_benefitself + A_benefitpartner)/2))
+```
+
+```{r conditioning}
+yes_benefit <- honesty_partners_clean %>%
+  filter(combined_benefit > 1)
+
+no_benefit <- honesty_partners_clean %>%
+  filter(combined_benefit == 1)
+
+ggplot()+
+  stat_smooth(data = yes_benefit, method = "lm", se = F, geom = "line", linewidth = 0.6, alpha = 0.4, color = "#6699FF", aes(group = ID, x = A_goal2_centered, y = A_statehonesty))+
+  geom_smooth(data = no_benefit, aes(x = A_goal2_centered, y = A_statehonesty), method = "lm", color = "blue3", linetype = "dashed")+
+  geom_smooth(data = yes_benefit, aes(x = A_goal2_centered, y = A_statehonesty), method = "lm", color = "black")+
+  theme_classic()+
+  geom_point(data = yes_benefit, aes(x = A_goal2_centered, y = A_statehonesty), color = "black", alpha = 0.6)+
+  geom_point(data = no_benefit, aes(x = A_goal2_centered, y = A_statehonesty), color = "blue", alpha = 0.4)+
+  geom_vline(xintercept = 0, linetype = "dashed", linewidth = 0.6)+
+  scale_y_continuous(
+    limits = c(1, 4.3),
+    expand = c(0, 0)
+    )+
+  scale_x_continuous(
+    limits = c(-3, 3),
+    expand = c(0, 0)
+    )+
+  labs(title = "Within-person contingencies between honesty and avoiding disapproval",
+       x = "How much were you trying to avoid your partner's disapproval?",
+       y = "State Honesty")
+```
+
+```{r ok}
+ggplot()+
+  stat_smooth(data = yes_benefit, method = "lm", se = F, geom = "line", linewidth = 0.6, alpha = 0.4, color = "#6699FF", aes(group = ID, x = A_goal7_centered, y = A_statehonesty))+
+  geom_smooth(data = no_benefit, aes(x = A_goal7_centered, y = A_statehonesty), method = "lm", color = "blue3", linetype = "dashed")+
+  geom_smooth(data = yes_benefit, aes(x = A_goal7_centered, y = A_statehonesty), method = "lm", color = "black")+
+  theme_classic()+
+  geom_vline(xintercept = 0, linetype = "dashed", linewidth = 0.6)+
   scale_y_continuous(
     limits = c(1, 4.3),
     expand = c(0, 0)
