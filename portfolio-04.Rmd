@@ -179,11 +179,9 @@ no_benefit <- honesty_partners_clean %>%
 
 ggplot()+
   stat_smooth(data = yes_benefit, method = "lm", se = F, geom = "line", linewidth = 0.6, alpha = 0.4, color = "#6699FF", aes(group = ID, x = A_goal2_centered, y = A_statehonesty))+
-  geom_smooth(data = no_benefit, aes(x = A_goal2_centered, y = A_statehonesty), method = "lm", color = "blue3", linetype = "dashed")+
-  geom_smooth(data = yes_benefit, aes(x = A_goal2_centered, y = A_statehonesty), method = "lm", color = "black")+
+  geom_smooth(data = no_benefit, aes(x = A_goal2_centered, y = A_statehonesty), method = "lm", color = "blue3", linetype = "dashed", linewidth = 1.5, alpha = 0.3)+
+  geom_smooth(data = yes_benefit, aes(x = A_goal2_centered, y = A_statehonesty), method = "lm", color = "navy", linewidth = 1.5, alpha = 0.3)+
   theme_classic()+
-  geom_point(data = yes_benefit, aes(x = A_goal2_centered, y = A_statehonesty), color = "black", alpha = 0.6)+
-  geom_point(data = no_benefit, aes(x = A_goal2_centered, y = A_statehonesty), color = "blue", alpha = 0.4)+
   geom_vline(xintercept = 0, linetype = "dashed", linewidth = 0.6)+
   scale_y_continuous(
     limits = c(1, 4.3),
@@ -201,8 +199,9 @@ ggplot()+
 ```{r ok}
 ggplot()+
   stat_smooth(data = yes_benefit, method = "lm", se = F, geom = "line", linewidth = 0.6, alpha = 0.4, color = "#6699FF", aes(group = ID, x = A_goal7_centered, y = A_statehonesty))+
-  geom_smooth(data = no_benefit, aes(x = A_goal7_centered, y = A_statehonesty), method = "lm", color = "blue3", linetype = "dashed")+
-  geom_smooth(data = yes_benefit, aes(x = A_goal7_centered, y = A_statehonesty), method = "lm", color = "black")+
+  stat_smooth(data = no_benefit, method = "lm", se = F, geom = "line", linewidth = 0.6, linetype = "dashed", alpha = 0.4, color = "skyblue", aes(group = ID, x = A_goal7_centered, y = A_statehonesty))+
+  geom_smooth(data = no_benefit, aes(x = A_goal7_centered, y = A_statehonesty), method = "lm", color = "blue3", linetype = "dashed", linewidth = 1.5, alpha = 0.3)+
+  geom_smooth(data = yes_benefit, aes(x = A_goal7_centered, y = A_statehonesty), method = "lm", color = "navy", linewidth = 1.5, alpha = 0.3)+
   theme_classic()+
   geom_vline(xintercept = 0, linetype = "dashed", linewidth = 0.6)+
   scale_y_continuous(
